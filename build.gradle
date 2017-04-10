@@ -21,7 +21,9 @@ def wsdls = [
         'weather': 'org.bk.weather.soap.WeatherServiceEndpoint',
         'calc'   : 'org.bk.calc.endpoint.CalculatorEndpoint'
 ]
-def generatedPath = './generated'
+def generatedPath = "${projectDir}/generated"
+
+
 
 repositories {
     mavenCentral()
@@ -37,16 +39,24 @@ clean{
     delete generatedPath
 }
 
-task createJava(dependsOn: 'createWsdl') {
+task testPath(group:'wsdl') {
+	doLast {
+		println projectDir
+	}
+}
+
+
+task createJava(dependsOn: 'createWsdl',group:'wsdl') {
     doLast {
         wsdls.each { entry ->
             String wsdl = new File(resDir, entry.key + '.wsdl')
+			println generatedPath
             WSDLToJava.main(['-d',generatedPath,wsdl] as String[])
         }
     }
 }
 
-task createWsdl(dependsOn: 'compileJava') {
+task createWsdl(dependsOn: 'compileJava', group:'wsdl') {
     doLast {
         wsdls.each { entry ->
             //because it's within classpath
